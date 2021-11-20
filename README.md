@@ -21,21 +21,21 @@ python manage.py runserver
 
 # endpoints
 
-get cards/
-post cards/
-get cards/id/
-patch cards/id/
-del cards/id/
+- get cards/
+- post cards/
+- get cards/id/
+- patch cards/id/
+- del cards/id/
 
-get products/
-post products/
-get products/id/
-patch products/id/
-del products/id/
+- get products/
+- post products/
+- get products/id/
+- patch products/id/
+- del products/id/
 
-get purchases/
-post purchases/
+- get purchases/
+- post purchases/
 
-post auth/register/
-post auth/login/
-post auth/login/refresh
+- post auth/register/
+- post auth/login/
+- post auth/login/refresh
