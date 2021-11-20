@@ -44,10 +44,13 @@ class CreateCards(generics.CreateAPIView):
     serializer_class = CardGeneratorSerializer
 
     def create(self, request, *args, **kwargs):
-        cards = CardGenerator.generate_cards()
+        cards = CardGenerator.generate_cards(series=request.query_params['series'],
+                                             quantity=request.query_params['quantity'],
+                                             expiration_months=request.query_params['expiration_months'],
+                                             credit=request.query_params['credit'])
         for item in cards:
             new_card = Card(series=item['series'],
-                            number=item['number'],
+                            quantity=item['quantity'],
                             credit=item['credit'],
                             expiration_months=item['expiration_months'])
             new_card.save()
