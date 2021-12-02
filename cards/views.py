@@ -1,14 +1,24 @@
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework import generics, permissions, renderers
-from cards.models import Card, Purchase
-from cards.serializers import CardCreateSerializer, CardGeneratorSerializer, CardShowSerializer, PurchaseListSerializer, PurchaseCreateSerializer
-from cards.services import CardGenerator
+from rest_framework import generics, filters
+from rest_framework.pagination import LimitOffsetPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from cards.models import Card, CardCollection, Purchase
+from cards.serializers import (
+    CardCollectionSerializer, CardCreateSerializer,
+    CardShowSerializer, PurchaseListSerializer, PurchaseCreateSerializer
+)
+from cards.filters import CardFilter
 
 
 class CardList(generics.ListCreateAPIView):
     queryset = Card.objects.all()
     serializer_class = CardShowSerializer
+    filter_backends = [filters.OrderingFilter, DjangoFilterBackend]
+    filterset_class = CardFilter
+    ordering_fields = ['series', 'number',
+                       'created', 'status', 'credit', 'expiration_date']
+    pagination_class = LimitOffsetPagination
 
     def get_serializer_class(self):
         serializer_class = CardShowSerializer
@@ -21,11 +31,11 @@ class CardDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Card.objects.all()
     serializer_class = CardShowSerializer
 
-    def get_serializer_class(self):
-        serializer_class = CardShowSerializer
-        if self.request.method == 'POST' or self.request.method == 'PATCH':
-            serializer_class = CardCreateSerializer
-        return serializer_class
+    # def get_serializer_class(self):
+    #     serializer_class = CardShowSerializer
+    #     if self.request.method == 'POST' or self.request.method == 'PATCH':
+    #         serializer_class = CardCreateSerializer
+    #     return serializer_class
 
 
 class PurchaseList(generics.ListCreateAPIView):
@@ -40,19 +50,11 @@ class PurchaseList(generics.ListCreateAPIView):
         return serializer_class
 
 
+class PurchaseDetail(generics.DestroyAPIView):
+    queryset = Purchase.objects.all()
+    serializer_class = PurchaseListSerializer
+
+
 class CreateCards(generics.CreateAPIView):
-    serializer_class = CardGeneratorSerializer
-
-    def create(self, request, *args, **kwargs):
-        print(request.query_params)
-        print(kwargs)
-        cards = CardGenerator.generate_cards(series=str(request.query_params['series']),
-                                             quantity=int(
-                                                 request.query_params['quantity']),
-                                             expiration_months=int(
-                                                 request.query_params['expiration_months']),
-                                             credit=float(request.query_params['credit']))
-
-        response = f'{cards} cards created'
-
-        return Response(response, status=201)
+    queryset = CardCollection.objects.all()
+    serializer_class = CardCollectionSerializer
