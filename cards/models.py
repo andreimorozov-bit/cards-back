@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 import uuid
 from dateutil.relativedelta import relativedelta
 from datetime import datetime, timedelta
@@ -59,7 +60,7 @@ class CardCollection(models.Model):
     expiration_months = models.IntegerField()
     credit = models.DecimalField(max_digits=8, decimal_places=2)
     created = models.DateTimeField(auto_now_add=True)
-    quantity = models.IntegerField()
+    quantity = models.IntegerField(validators=[MaxValueValidator(1000)])
 
     def save(self, *args, **kwargs):
         for item in range(0, self.quantity):
